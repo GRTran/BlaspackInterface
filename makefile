@@ -11,14 +11,14 @@ OBJS=			    			BlaspackInterface.o																			\
 MODS= $(OBJS:.o=.mod)
 
 #Set the executable name
-EXEC=blas
+EXEC=blaspack_interface
 
 #Set up a variable to represent the makefile
 DEFAULT=makefile
 
 # Compiler options
-MY_OPTIONS    =           -fcheck=bounds -ffree-line-length-800 -o -g -DDEBUG -I/usr/include/ -L/var/lib/dpkg/info/ -llapack -lblas
-
+MY_OPTIONS    =           -fcheck=bounds -ffree-line-length-800 -o -g -DDEBUG
+LAPACK = -llapack -lblas
 
 #Set directories to look for source files, etc
 VPATH = $(SCRIPTS_PATH)
@@ -31,19 +31,19 @@ all : $(EXEC)
 
 #Object files required to be updated if corresponding .F90 files have changed
 %.o : %.f90
-	$(FC) $(MY_OPTIONS) $(FFLAGS) -c -o  $@ $<
+	$(FC) $(MY_OPTIONS) $(FFLAGS) -c -o  $@ $< $(LAPACK)
 
 #Object files required to be updated if corresponding .f files have changed
 %.o : %.f
-	$(FC) $(FFLAGS) -c -o $@ $<
+	$(FC) $(FFLAGS) -c -o $@ $< $(LAPACK)
 
 #Object files required to be updated if corresponding .c files have changed
 %.o : %.c
-	$(CC) $(CFLAGS) -c -o  $@ $<
+	$(CC) $(CFLAGS) -c -o  $@ $< $(LAPACK)
 
 #For the executable to be up to date the object files must be up to date. Then link the objects
 $(EXEC): $(OBJS)
-	$(LD) $^ $(LFLAGS) -g  -o $@
+	$(LD) $^ $(LFLAGS) $(LAPACK) -g  -o $@
 
 #Clean the directory and any directories searched
 .PHONY : clean
